@@ -1,9 +1,9 @@
 import axios from "axios";
-
+import { baseUrl } from "../../../baseUrl";  
 export const register = async ({ username, email, password }) => {
 
   try {
-    const response = await axios.post("https://special-winner-9774xggx9rg5hqrw-3000.app.github.dev/api/auth/register", {
+    const response = await axios.post(`${baseUrl}/auth/register`, {
       username, email, password
     }, {
       withCredentials: true
@@ -20,7 +20,7 @@ export const register = async ({ username, email, password }) => {
 export const login = async ({ email, password }) => {
 
   try {
-    const response = await axios.post("https://special-winner-9774xggx9rg5hqrw-3000.app.github.dev/api/auth/login", {
+    const response = await axios.post(`${baseUrl}/auth/login`, {
       email, password
     }, {
       withCredentials: true
@@ -39,7 +39,7 @@ export const login = async ({ email, password }) => {
 export const logout = async () => {
 
   try {
-    const response = await axios.get("https://special-winner-9774xggx9rg5hqrw-3000.app.github.dev/api/auth/logout", {
+    const response = await axios.get(`${baseUrl}/auth/logout`, {
     }, {
       withCredentials: true
     })
@@ -54,7 +54,7 @@ export const logout = async () => {
 export const getme = async () => {
 
   try {
-    const response = await axios.get("https://special-winner-9774xggx9rg5hqrw-3000.app.github.dev/api/auth/getme", {
+    const response = await axios.get(`${baseUrl}/auth/getme`, {
     }, {
       withCredentials: true
     })
