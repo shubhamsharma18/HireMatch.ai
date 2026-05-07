@@ -1,82 +1,55 @@
-import React from 'react'
-import '../auth.form.scss'
-import { useState } from 'react'
-import { Link } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
-export const Login = () => {
+import React,{useState} from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import "../auth.form.scss"
+import { useAuth } from '../hooks/useAuth'
 
+const Login = () => {
 
     const { loading, handleLogin } = useAuth()
+    const navigate = useNavigate()
 
-    const [error,setError]=useState("")
+    const [ email, setEmail ] = useState("")
+    const [ password, setPassword ] = useState("")
+    const [ error, setError ] = useState("")
 
-
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    async function handle(e) {
-        e.preventDefault();
-      try {
-         const result = await handleLogin({ email, password })
-         if(result.status===400){
-            throw new Error(result.data.message)
-         }  
-      } 
-      catch (error) {
-        console.log(error)
-        setError(error.message)
-      }
-       
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        const result = await handleLogin({email,password})
+        if (result.success) {
+            navigate('/')
+        } else {
+            setError(result.error || 'Login failed')
+        }
     }
 
-    if (loading) {
-        return(
-            <div style={{ minHeight: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-
-                <div>
-                    <h1 style={{ color: "white" }}>Loading... </h1>
-                </div>
-            </div>
-        )
+    if(loading){
+        return (<main><h1>Loading.......</h1></main>)
     }
+
 
     return (
         <main>
-
-
-
             <div className="form-container">
-
-
-                <div className='heading'>Login Page</div>
-
-                <form onSubmit={handle}>
-
-
+                <h1>Login</h1>
+                <form onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label htmlFor="email">Email</label>
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} name="email" id="email" placeholder='Enter your email' />
-{error.includes("email") && <p className="text-red-500">{error}</p>}
+                        <input
+                            onChange={(e) => { setEmail(e.target.value) }}
+                            type="email" id="email" name='email' placeholder='Enter email address' />
                     </div>
-
                     <div className="input-group">
                         <label htmlFor="password">Password</label>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} name="password" id="password" placeholder='Enter your password' />
-
+                        <input
+                            onChange={(e) => { setPassword(e.target.value) }}
+                            type="password" id="password" name='password' placeholder='Enter password' />
                     </div>
-                    {error.includes("password") && <p style={{color: "red"}}>{error}</p>}
-
-
-                    <button className='button primary-button' disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
-                    </button>
-
-
-
+                    <button className='button primary-button' >Login</button>
                 </form>
-
-                <p>Don't have an account? <Link to="/register">Register</Link></p>
-
+                <p>Don't have an account? <Link to={"/register"} >Register</Link> </p>
             </div>
         </main>
     )
 }
+
+export default Login

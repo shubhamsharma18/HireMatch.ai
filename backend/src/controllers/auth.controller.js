@@ -7,7 +7,7 @@ const registerController= async(req,res)=>{
 const {username,email,password}=req.body
 
 if(!username || !email || !password){
-    res.status(400).json({
+    return res.status(400).json({
         message:"Please provide username,email,password"
     })
 }

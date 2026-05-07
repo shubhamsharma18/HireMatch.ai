@@ -1,9 +1,10 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'; 
-export const Register=()=>{
+const Register = ()=>{
 
     const {loading,handleRegister}=useAuth()    
+    const navigate = useNavigate()
 
     const [username,setUsername]=useState("")
     const [email,setEmail]=useState("")
@@ -14,10 +15,10 @@ export const Register=()=>{
         e.preventDefault();
         try {
             const result=await handleRegister({username,email,password})
-            if(result.status===400){
-                throw new Error(result.data.message)
+            if (!result.success) {
+                throw new Error(result.error || 'Registration failed')
             }
-            console.log(result) 
+            navigate('/')
         } catch (error) {
             console.log(error)
             setError(error.message)
@@ -53,6 +54,7 @@ export const Register=()=>{
                         <input type="password" name="password" id="password" placeholder='Enter your password' value={password} onChange={(e) => setPassword(e.target.value)} />
 
                     </div>
+                    {error && <p className='form-error'>{error}</p>}
 
 
                     <button className='button primary-button'>Register</button>
@@ -68,3 +70,5 @@ export const Register=()=>{
         </main>
     )
 }
+
+export default Register

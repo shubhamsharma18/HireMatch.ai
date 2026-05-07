@@ -1,33 +1,33 @@
-const jwt=require("jsonwebtoken")
-const blacklistTokenModel = require("../models/blacklistToken.model")
+const jwt = require("jsonwebtoken");
+const blacklistTokenModel = require("../models/blacklistToken.model");
 
-const authMiddleware=async(req,res,next)=>{
+const authMiddleware = async (req, res, next) => {
+    try {
+        const token = req.cookies.myToken;
 
-const token=req.cookies.myToken
+        if (!token) {
+            return res.status(401).json({   // ← return + 401 status
+                "message": "Token is not available. Please login."
+            });
+        }
 
-if(!token){
-    res.status(400).json({
-        "message":"Token is not available"
-    })
-}
-const isTokenBlacklist=await blacklistTokenModel.findOne({token})
+        const isTokenBlacklist = await blacklistTokenModel.findOne({ token });
 
-if(isTokenBlacklist){
-    res.status(400).json({
-        "message":"Token is blacklisted"
-    })
-}
-try {
-    const decoded=await jwt.verify(token,process.env.JWT_SECRET)
-    
-    req.user=decoded
-    next()
-} catch (error) {
-    res.status(400).json({
-        "message":"Invalid Token"
-    })
-}
+        if (isTokenBlacklist) {
+            return res.status(401).json({   // ← return
+                "message": "Token is blacklisted. Please login again."
+            });
+        }
 
-}
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+        
+    } catch (error) {
+        return res.status(401).json({       // ← return
+            "message": "Invalid or expired token"
+        });
+    }
+};
 
-module.exports=authMiddleware
+module.exports = authMiddleware;
