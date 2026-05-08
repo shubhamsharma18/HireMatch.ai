@@ -14,8 +14,13 @@ async function generateInterviewReport(req, res) {
             const mimeType = req.file.mimetype;
 
             if (mimeType === "application/pdf" || fileName.endsWith(".pdf")) {
-                const pdfData = await pdfParse(req.file.buffer);
-                resumeText = pdfData.text;
+                try {
+                    const pdfData = await pdfParse(req.file.buffer);
+                    resumeText = pdfData.text;
+                } catch (error) {
+                    console.error("PDF parsing error:", error);
+                    return res.status(400).json({ message: "Failed to parse PDF. Please try a different file or use self-description." });
+                }
             } else if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || fileName.endsWith(".docx")) {
                 const result = await mammoth.extractRawText({ buffer: req.file.buffer });
                 resumeText = result.value;

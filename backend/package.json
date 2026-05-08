@@ -20,19 +20,19 @@
   },
   "homepage": "https://github.com/shubhamsharma18/HireMatch.ai#readme",
   "dependencies": {
-    "@google/genai": "^1.51.0",
+    "@google/generative-ai": "^0.24.1",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "mammoth": "^1.6.0",
     "mongoose": "^9.5.0",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "pdfkit": "^0.14.0",
-    "mammoth": "^1.6.0",
     "zod": "^4.4.2",
     "zod-to-json-schema": "^3.25.2"
   }

@@ -28,6 +28,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     align-items: center;
     justify-content: center;
     padding: 3rem 1.5rem;
+    padding-top: 6rem; // Account for navbar
     gap: 2rem;
 }
 

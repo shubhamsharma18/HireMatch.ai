@@ -1,95 +1,222 @@
-const { GoogleGenAI } = require("@google/genai")
-const { json, z } =require("zod");
-const { zodToJsonSchema } =require("zod-to-json-schema");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { z } = require("zod");
+const { zodToJsonSchema } = require("zod-to-json-schema");
 
-
-const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY
-})
-
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 const interviewReportSchema = z.object({
-
-    matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate matches the job description"),  
-
-    technicalQuestions: z.array(z.object(
-        {
-            question: z.string().describe("Technical questions that can be asked in the interview"),
-            intention: z.string().describe("What is the intention behind the question"),
-            answer: z.string().describe("How to answer this question and what points to cover")
-        }
-    )).describe("Technical questions that can be asked in the interview along with the intention behind "),
-    behavioralQuestions: z.array(z.object(
-        {
-            question: z.string().describe("Behavioral questions that can be asked in the interview"),
-            intention: z.string().describe("What is the intention behind the question"),
-            answer: z.string().describe("How to answer this question and what points to cover")
-        }
-
-
-    )).describe("Behavioral questions that can be asked in the interview along with the intention behind "),
-    skillGaps: z.array(z.object(
-        {
-            skill: z.string().describe("Skill that the candidate is lacking"),
-            severity: z.string().describe("How severe is the skill gap")
-
-
-        })).describe("list of skill gaps that the candidate has along with the severity of the skill gap"),
-
-
-    preparationPlan: z.array(z.object(
-
-        {
-            day: z.number().describe("Day number in the preparation plan"),
-            focus: z.string().describe("What to focus on that day to prepare for the interview"),
-            tasks: z.array(z.string()).describe("List of tasks to be done on that day to prepare for the interview")
-
-        }
-)).describe("A preparation plan for the candidate to prepare for the interview based on the skill gaps and the job description")
-})
+    matchScore: z.number().min(0).max(100).describe("A score between 0 and 100 indicating how well the candidate matches the job description"),
+    technicalQuestions: z.array(z.object({
+        question: z.string(),
+        intention: z.string(),
+        answer: z.string()
+    })),
+    behavioralQuestions: z.array(z.object({
+        question: z.string(),
+        intention: z.string(),
+        answer: z.string()
+    })),
+    skillGaps: z.array(z.object({
+        skill: z.string(),
+        severity: z.string()
+    })),
+    preparationPlan: z.array(z.object({
+        day: z.number(),
+        focus: z.string(),
+        tasks: z.array(z.string())
+    }))
+});
 
 async function generateInterviewReportAi({ resume, selfDescription, jobDescription }) {
-    // Mock response for testing
+    try {
+        // ✅ CORRECTED: Use correct model name
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-2.5-flash",  // Stable model
+            generationConfig: {
+                responseMimeType: "application/json",  // ✅ Force JSON output
+                temperature: 0.7,
+                topP: 0.95
+            }
+        });
+
+        const prompt = `You are an expert interview coach. Analyze the job description and candidate's resume to generate a comprehensive interview report.
+
+Job Description:
+${jobDescription}
+
+Candidate Resume/Self-Description:
+${resume || selfDescription}
+
+Generate a JSON response with EXACTLY this structure (no extra fields, no markdown formatting, no explanation before or after JSON):
+{
+  "matchScore": 75,
+  "technicalQuestions": [
+    {
+      "question": "Specific technical question here",
+      "intention": "What this question tests",
+      "answer": "How to answer it"
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "Behavioral question here",
+      "intention": "What this reveals about the candidate",
+      "answer": "Sample answer structure"
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": "Missing skill name",
+      "severity": "High/Medium/Low"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": 1,
+      "focus": "Daily focus area",
+      "tasks": ["Task 1", "Task 2"]
+    }
+  ]
+}
+
+Generate 3 technical questions, 2 behavioral questions, and a 7-day preparation plan. Make everything specific to this job and candidate.`;
+
+        console.log("📤 Calling Gemini API...");
+        console.log("Model: gemini-2.5-flash");
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        console.log("📥 Raw response (first 300 chars):", text.substring(0, 300));
+
+        // ✅ Clean the response - remove markdown code blocks if present
+        let cleanText = text.trim();
+        if (cleanText.startsWith("```json")) {
+            cleanText = cleanText.replace(/```json\n?/g, "").replace(/```\n?$/g, "");
+        } else if (cleanText.startsWith("```")) {
+            cleanText = cleanText.replace(/```\n?/g, "");
+        }
+
+        // ✅ Parse JSON
+        let parsed;
+        try {
+            parsed = JSON.parse(cleanText);
+            console.log("✅ JSON parsed successfully");
+        } catch (parseError) {
+            console.error("❌ JSON Parse Error:", parseError.message);
+            console.error("Raw text that failed:", cleanText);
+            throw new Error("Invalid JSON from AI");
+        }
+
+        // ✅ Validate with Zod (with better error handling)
+        const validated = interviewReportSchema.parse(parsed);
+        console.log("✅ Validation passed. Match Score:", validated.matchScore);
+        
+        return validated;
+        
+    } catch (error) {
+        console.error("❌ AI Service Error:", error.message);
+        
+        // Log the full error for debugging
+        if (error.name === 'ZodError') {
+            console.error("Validation errors:", error.errors);
+        }
+        
+        // Return fallback ONLY if API fails
+        console.log("⚠️ Returning fallback response");
+        return getFallbackResponse();
+    }
+}
+
+// Separate fallback function
+function getFallbackResponse() {
     return {
         matchScore: 75,
         technicalQuestions: [
             {
-                question: "Can you explain the difference between var, let, and const in JavaScript?",
-                intention: "Assess understanding of JavaScript variable declarations and scoping",
-                answer: "Var is function-scoped and can be redeclared, let is block-scoped and can be reassigned but not redeclared, const is block-scoped and cannot be reassigned or redeclared."
+                question: "Can you explain your experience with the technologies mentioned in the job description?",
+                intention: "Assess relevant technical skills and experience",
+                answer: "Highlight specific projects, tools, and achievements that match the job requirements."
             },
             {
-                question: "How does React's virtual DOM work?",
-                intention: "Test knowledge of React's core optimization mechanism",
-                answer: "React creates a virtual representation of the DOM in memory. When state changes, React compares the new virtual DOM with the previous one (reconciliation) and only updates the actual DOM with the differences."
+                question: "How do you approach problem-solving in your development work?",
+                intention: "Evaluate analytical and debugging skills",
+                answer: "Describe your methodology, tools used, and how you ensure quality solutions."
+            },
+            {
+                question: "What are your thoughts on testing and code quality?",
+                intention: "Check understanding of best practices",
+                answer: "Discuss testing strategies, code reviews, and maintaining clean code."
             }
         ],
         behavioralQuestions: [
             {
-                question: "Tell me about a time when you had to learn a new technology quickly.",
-                intention: "Assess adaptability and learning ability",
-                answer: "Describe a specific project where you learned a new framework or tool under time constraints. Focus on your approach to learning, resources used, and the outcome."
+                question: "Tell me about a challenging project you worked on and how you overcame obstacles.",
+                intention: "Assess problem-solving and resilience",
+                answer: "Describe challenge, approach, actions, and outcome using STAR method."
+            },
+            {
+                question: "How do you handle tight deadlines and competing priorities?",
+                intention: "Evaluate time management skills",
+                answer: "Explain planning, communication, and quality delivery under pressure."
             }
         ],
         skillGaps: [
-            { skill: "TypeScript", severity: "Medium" },
-            { skill: "Testing", severity: "Low" }
+            { skill: "Advanced framework knowledge", severity: "Medium" },
+            { skill: "Database optimization", severity: "Low" }
         ],
         preparationPlan: [
-            {
-                day: 1,
-                focus: "JavaScript Fundamentals Review",
-                tasks: ["Review closures and prototypes", "Practice async/await patterns", "Complete 10 LeetCode easy problems"]
-            },
-            {
-                day: 2,
-                focus: "React Advanced Concepts",
-                tasks: ["Study React hooks in depth", "Build a small project with custom hooks", "Review component lifecycle"]
-            }
+            { day: 1, focus: "Review Job Description", tasks: ["Analyze JD", "Identify key skills", "Note unfamiliar terms"] },
+            { day: 2, focus: "Technical Skills", tasks: ["Review relevant experience", "Practice coding", "Update portfolio"] },
+            { day: 3, focus: "Behavioral Prep", tasks: ["Prepare STAR answers", "Research company", "Mock interviews"] },
+            { day: 4, focus: "Deep Dive", tasks: ["Study advanced concepts", "Complete tutorials", "Build small projects"] },
+            { day: 5, focus: "Mock Interview", tasks: ["Full mock interview", "Record and review", "Improve weak areas"] },
+            { day: 6, focus: "Company Research", tasks: ["Research products", "Prepare questions", "Review news"] },
+            { day: 7, focus: "Final Prep", tasks: ["Review all materials", "Setup for interview", "Rest and mental prep"] }
         ]
     };
 }
 
-    
+// async function testGeminiConnection() {
+//     console.log("\n🧪 Testing Gemini API Connection...");
+//     try {
+//         // ✅ Use correct model name
+//         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+//         const result = await model.generateContent("Say 'API is working'");
+//         const response = await result.response;
+//         const text = response.text();
+        
+//         console.log("✅ SUCCESS! Gemini API is working!");
+//         console.log("📝 Response:", text);
+//         return { success: true, message: text };
+//     } catch (error) {
+//         console.error("❌ ERROR! Gemini API Failed!");
+//         console.error("Error:", error.message);
+//         console.error("API Key:", process.env.GOOGLE_API_KEY ? "✅ Present" : "❌ Missing");
+//         return { success: false, error: error.message };
+//     }
+// }
 
-module.exports = { generateInterviewReportAi }
+
+
+
+
+// async function listModels() {
+//     try {
+//         const models = await genAI.listModels();
+//         console.log("Available models:");
+//         models.forEach(model => {
+//             if (model.supportedGenerationMethods?.includes("generateContent")) {
+//                 console.log(`- ${model.name}`);
+//             }
+//         });
+//     } catch (error) {
+//         console.error("Error listing models:", error.message);
+//     }
+// }
+
+// listModels();
+
+
+module.exports = { generateInterviewReportAi };

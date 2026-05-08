@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import '../styles/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, useParams } from 'react-router-dom'
+import Navbar from '../../auth/components/Navbar'
+import Loader from '../../../ui/Loader.jsx'
 
 
 
@@ -39,22 +41,39 @@ const QuestionCard = ({ item, index }) => {
     )
 }
 
-const RoadMapDay = ({ day }) => (
-    <div className='roadmap-day'>
-        <div className='roadmap-day__header'>
-            <span className='roadmap-day__badge'>Day {day.day}</span>
-            <h3 className='roadmap-day__focus'>{day.focus}</h3>
+const RoadMapDay = ({ day }) => {
+    // Safety checks
+    if (!day) {
+        return <div className='roadmap-day error'>Invalid day data</div>;
+    }
+    
+    const tasks = Array.isArray(day.tasks) ? day.tasks : [];
+    const dayNumber = day.day || '?';
+    const focus = day.focus || 'No focus area specified';
+    
+    return (
+        <div className='roadmap-day'>
+            <div className='roadmap-day__header'>
+                <span className='roadmap-day__badge'>Day {dayNumber}</span>
+                <h3 className='roadmap-day__focus'>{focus}</h3>
+            </div>
+            <ul className='roadmap-day__tasks'>
+                {tasks.length === 0 ? (
+                    <li className='roadmap-day__empty'>
+                        <span>No specific tasks for this day</span>
+                    </li>
+                ) : (
+                    tasks.map((task, i) => (
+                        <li key={i}>
+                            <span className='roadmap-day__bullet' />
+                            {task}
+                        </li>
+                    ))
+                )}
+            </ul>
         </div>
-        <ul className='roadmap-day__tasks'>
-            {day.tasks.map((task, i) => (
-                <li key={i}>
-                    <span className='roadmap-day__bullet' />
-                    {task}
-                </li>
-            ))}
-        </ul>
-    </div>
-)
+    )
+}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
@@ -73,7 +92,7 @@ const Interview = () => {
     if (loading) {
         return (
             <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+               <Loader text="Generating your personalized interview plan..." />
             </main>
         )
     }
@@ -81,8 +100,7 @@ const Interview = () => {
     if (!report) {
         return (
             <main className='loading-screen'>
-                <h1>Unable to load the interview plan.</h1>
-                <p>Please return to the home page and try again.</p>
+                <Loader text="Unable to load the interview plan." />
             </main>
         )
     }
@@ -94,6 +112,7 @@ const Interview = () => {
 
     return (
         <div className='interview-page'>
+            <Navbar />
             <div className='interview-layout'>
 
                 {/* ── Left Nav ── */}

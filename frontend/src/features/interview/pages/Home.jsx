@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react'
 import "../styles/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../../auth/components/Navbar'
+import Loader from '../../../ui/Loader'
 
 const Home = () => {
 
@@ -45,13 +47,15 @@ const Home = () => {
     if (loading) {
         return (
             <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+                <Loader />
+              
             </main>
         )
     }
 
     return (
         <div className='home-page'>
+            <Navbar />
 
             {/* Page Header */}
             <header className='page-header'>
