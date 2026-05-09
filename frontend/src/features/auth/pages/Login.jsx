@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
+import Loader from '../../../ui/Loader'
 
 const Login = () => {
 
@@ -22,8 +23,12 @@ const Login = () => {
         }
     }
 
-    if(loading){
-        return (<main><h1>Loading.......</h1></main>)
+    if (loading) {
+        return (
+            <main>
+                <Loader fullScreen={true} type='spinner' text='Signing you in...' />
+            </main>
+        )
     }
 
 

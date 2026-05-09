@@ -3,14 +3,15 @@ import "../styles/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../auth/components/Navbar'
-import Loader from '../../../ui/Loader'
+import Loader, { ButtonLoader } from '../../../ui/Loader'
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, generateReport, reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const [error, setError] = useState("")
+    const [isGenerating, setIsGenerating] = useState(false)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
@@ -29,6 +30,7 @@ const Home = () => {
             return
         }
 
+        setIsGenerating(true)
         try {
             const data = await generateReport({ jobDescription, selfDescription, resumeFile })
 
@@ -41,16 +43,9 @@ const Home = () => {
         } catch (error) {
             console.error("Error generating report:", error)
             setError(error?.response?.data?.error || error?.message || "Failed to generate interview report. Please try again.")
+        } finally {
+            setIsGenerating(false)
         }
-    }
-
-    if (loading) {
-        return (
-            <main className='loading-screen'>
-                <Loader />
-              
-            </main>
-        )
     }
 
     return (
@@ -143,19 +138,29 @@ const Home = () => {
                     <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
                     {error && <p className='form-error'>{error}</p>}
                     <button
-                        disabled={loading}
+                        disabled={isGenerating}
                         onClick={handleGenerateReport}
                         className='generate-btn'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-                        {loading ? 'Generating...' : 'Generate My Interview Strategy'}
+                        {isGenerating ? 'Generating...' : 'Generate My Interview Strategy'}
                     </button>
+                    {isGenerating && (
+                        <div className='button-loader-wrapper'>
+                            <ButtonLoader />
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Recent Reports List */}
-            {reports.length > 0 && (
-                <section className='recent-reports'>
-                    <h2>My Recent Interview Plans</h2>
+            <section className='recent-reports'>
+                <h2>My Recent Interview Plans</h2>
+
+                {loading && reports.length === 0 ? (
+                    <div className='reports-loading'>
+                        <Loader text='Fetching your recent plans...' />
+                    </div>
+                ) : reports.length > 0 ? (
                     <ul className='reports-list'>
                         {reports.map(report => (
                             <li key={report._id} className='report-item' onClick={() => navigate(`/interview/${report._id}`)}>
@@ -165,8 +170,10 @@ const Home = () => {
                             </li>
                         ))}
                     </ul>
-                </section>
-            )}
+                ) : (
+                    <p className='no-reports-message'>No interview plans yet. Generate one to get started.</p>
+                )}
+            </section>
 
             {/* Page Footer */}
             <footer className='page-footer'>

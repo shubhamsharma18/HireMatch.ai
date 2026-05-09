@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react'
-import { useAuth } from '../hooks/useAuth'; 
+import { useAuth } from '../hooks/useAuth';
+import Loader from '../../../ui/Loader'
+
 const Register = ()=>{
 
     const {loading,handleRegister}=useAuth()    
@@ -28,6 +30,13 @@ const Register = ()=>{
 
     }
 
+    if (loading) {
+        return (
+            <main>
+                <Loader fullScreen={true} type='spinner' text='Creating your account...' />
+            </main>
+        )
+    }
 
     return(
        <main>

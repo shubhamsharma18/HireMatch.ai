@@ -3,7 +3,7 @@ import '../styles/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, useParams } from 'react-router-dom'
 import Navbar from '../../auth/components/Navbar'
-import Loader from '../../../ui/Loader.jsx'
+import Loader from '../../../ui/Loader'
 
 
 
@@ -92,7 +92,7 @@ const Interview = () => {
     if (loading) {
         return (
             <main className='loading-screen'>
-               <Loader text="Generating your personalized interview plan..." />
+               <Loader fullScreen={true} text="Generating your personalized interview plan..." />
             </main>
         )
     }
@@ -100,7 +100,7 @@ const Interview = () => {
     if (!report) {
         return (
             <main className='loading-screen'>
-                <Loader text="Unable to load the interview plan." />
+                <Loader fullScreen={true} text="Unable to load the interview plan." />
             </main>
         )
     }

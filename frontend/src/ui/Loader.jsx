@@ -1,7 +1,9 @@
 import React from 'react'
 import './loader.scss'
 
-const Loader = ({ type = 'spinner', text = 'Loading...', fullScreen = false }) => {
+const Loader = ({ type = 'spinner', text = 'Loading...', fullScreen = false, active = true }) => {
+    if (!active) return null
+
     if (fullScreen) {
         return (
             <div className='loader-fullscreen'>
