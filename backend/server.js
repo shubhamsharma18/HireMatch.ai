@@ -8,7 +8,7 @@ const connectDB=require("./src/config/db.js")
 connectDB()
 const PORT=process.env.PORT || 4000
 app.listen(PORT,()=>{
-    console.log(`server is running http://localhost:${PORT}`)
+    console.log(`server is running on port http://localhost:${PORT} (accessible on all interfaces)`)
     
     // Test Gemini API on startup
     // setTimeout(() => {

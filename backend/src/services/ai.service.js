@@ -178,26 +178,27 @@ function getFallbackResponse() {
     };
 }
 
-// async function testGeminiConnection() {
-//     console.log("\n🧪 Testing Gemini API Connection...");
-//     try {
-//         // ✅ Use correct model name
-//         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-//         const result = await model.generateContent("Say 'API is working'");
-//         const response = await result.response;
-//         const text = response.text();
+async function testGeminiConnection() {
+    console.log("\n🧪 Testing Gemini API Connection...");
+    try {
+        // ✅ Use correct model name
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const result = await model.generateContent("Say 'API is working'");
+        const response = await result.response;
+        const text = response.text();
         
-//         console.log("✅ SUCCESS! Gemini API is working!");
-//         console.log("📝 Response:", text);
-//         return { success: true, message: text };
-//     } catch (error) {
-//         console.error("❌ ERROR! Gemini API Failed!");
-//         console.error("Error:", error.message);
-//         console.error("API Key:", process.env.GOOGLE_API_KEY ? "✅ Present" : "❌ Missing");
-//         return { success: false, error: error.message };
-//     }
-// }
+        console.log("✅ SUCCESS! Gemini API is working!");
+        console.log("📝 Response:", text);
+        return { success: true, message: text };
+    } catch (error) {
+        console.error("❌ ERROR! Gemini API Failed!");
+        console.error("Error:", error.message);
+        console.error("API Key:", process.env.GOOGLE_API_KEY ? "✅ Present" : "❌ Missing");
+        return { success: false, error: error.message };
+    }
+}
 
+// testGeminiConnection() 
 
 
 
@@ -217,6 +218,7 @@ function getFallbackResponse() {
 // }
 
 // listModels();
+
 
 
 module.exports = { generateInterviewReportAi };

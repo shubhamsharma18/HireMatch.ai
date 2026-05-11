@@ -1,12 +1,12 @@
 import { useAuth } from "../hooks/useAuth";
-
 import { Navigate } from "react-router-dom";
+import Loader from '../../../ui/Loader'
 
 export const ProtectedRoute = ({ children }) => {
-  const { user,loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader fullScreen={true} type='spinner' text='Loading...' />;
   }
 
   if (!user) {

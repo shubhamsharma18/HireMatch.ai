@@ -1,1 +1,1 @@
-export const baseUrl="https://special-winner-9774xggx9rg5hqrw-3000.app.github.dev/api"      
+export const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"      

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import './Navbar.scss'
@@ -13,7 +13,7 @@ const Navbar = () => {
     }
 
     const handleLogout =  () => {
-        
+       
         navigate('/login')
         setShowDropdown(false)
     }
@@ -24,6 +24,11 @@ const Navbar = () => {
                 {/* Logo */}
                 <div className='navbar__logo' onClick={() => navigate('/dashboard')}>
                     <h2>HireMatch.ai</h2>
+                </div>
+
+                {/* Greeting */}
+                <div className='navbar__greeting'>
+                   <h4> Hello, {user?.username || 'User'}</h4> <h3> Welcome to <span style={{color:"#ef4444"}}>HireMatch.ai</span></h3>
                 </div>
 
                 {/* User Profile */}
@@ -38,13 +43,6 @@ const Navbar = () => {
                     {/* Dropdown */}
                     {showDropdown && (
                         <div className='profile-dropdown'>
-                            <button onClick={() => { navigate('/profile'); setShowDropdown(false) }}>
-                                Profile
-                            </button>
-                            <button onClick={() => { navigate('/settings'); setShowDropdown(false) }}>
-                                Settings
-                            </button>
-                            <hr />
                             <button onClick={handleLogout} className='logout-btn'>
                                 Logout
                             </button>
