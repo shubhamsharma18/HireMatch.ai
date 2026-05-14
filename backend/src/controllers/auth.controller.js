@@ -31,7 +31,12 @@ const token=jwt.sign(
     {expiresIn:"1d"}
 )
 
-res.cookie("myToken",token)
+res.cookie("myToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000
+})
 res.status(201).json({
     "message":"User Registered",
     user:{
@@ -63,7 +68,12 @@ const token=jwt.sign(
     {expiresIn:"1d"}
 )
 
-res.cookie("myToken",token)
+res.cookie("myToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000
+})
 
 res.status(200).json({
     "message":"Login Sucess",
@@ -83,7 +93,11 @@ const logoutController=async(req,res)=>{
     if(token){
         await blacklistTokenModel.create({token})
     }
-    res.clearCookie("myToken")
+    res.clearCookie("myToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none"
+    })
     res.status(200).json({
         "message":"User Logout Sucessfully"
     })

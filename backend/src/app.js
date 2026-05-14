@@ -26,12 +26,14 @@ const corsOptions = {
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            // For Codespaces - allow any special-winner domain
-            if (origin.includes('special-winner') && origin.includes('app.github.dev')) {
+            const isRenderOrigin = origin?.endsWith('.onrender.com') || origin?.includes('.onrender.com');
+            const isGithubDevOrigin = origin?.includes('special-winner') && origin?.includes('app.github.dev');
+
+            if (isRenderOrigin || isGithubDevOrigin) {
                 callback(null, true);
             } else {
                 console.log('CORS blocked origin:', origin);
-                callback(null, true); // Temporarily allow for debugging
+                callback(new Error('Not allowed by CORS'));
             }
         }
     },
