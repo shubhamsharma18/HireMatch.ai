@@ -12,6 +12,7 @@ const corsOptions = {
         // Allow all github.dev domains (Codespaces)
         const allowedOrigins = [
             process.env.FRONTEND_ORIGIN,
+            "https://hire-match-ai-frontend.onrender.com",
             "https://special-winner-9774xggx9rg5hqrw-5174.app.github.dev",
             "https://special-winner-9774xggx9rg5hqrw-5175.app.github.dev",
             "http://localhost:5173",
