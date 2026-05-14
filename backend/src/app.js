@@ -4,6 +4,7 @@ const cors=require("cors")
 const cookieParser=require("cookie-parser")
 const interviewRouter=require("./routes/interview.routes.js")   
 const app =express()
+app.set('trust proxy', 1)
 
 // CORS configuration - handles both local development and production
 // Replace your CORS configuration with this

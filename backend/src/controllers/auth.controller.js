@@ -25,18 +25,21 @@ const user=await userModel.create({
     email,
     password:hash
 })
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000
+}
+
 const token=jwt.sign(
     {id:user._id,username:user.username},
     process.env.JWT_SECRET,
     {expiresIn:"1d"}
 )
 
-res.cookie("myToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000
-})
+res.cookie("myToken", token, cookieOptions)
 res.status(201).json({
     "message":"User Registered",
     user:{
@@ -61,31 +64,30 @@ if(!isMatch){
     })
 }
 
-// const token=jwt.sign()
+const cookieOptions = {
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000
+}
+
 const token=jwt.sign(
     {id:user._id,username:user.username},
     process.env.JWT_SECRET,
     {expiresIn:"1d"}
 )
 
-res.cookie("myToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000
-})
+res.cookie("myToken", token, cookieOptions)
 
 res.status(200).json({
     "message":"Login Sucess",
-      user:{
+    user:{
         id:user._id,
         username:user.username,
         email:user.email
     }
-
 })
 }
-
 
 
 const logoutController=async(req,res)=>{
@@ -93,11 +95,12 @@ const logoutController=async(req,res)=>{
     if(token){
         await blacklistTokenModel.create({token})
     }
-    res.clearCookie("myToken", {
+    const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: req.secure || req.headers["x-forwarded-proto"] === "https",
         sameSite: "none"
-    })
+    }
+    res.clearCookie("myToken", cookieOptions)
     res.status(200).json({
         "message":"User Logout Sucessfully"
     })

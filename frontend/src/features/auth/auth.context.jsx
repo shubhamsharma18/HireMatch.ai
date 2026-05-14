@@ -10,9 +10,14 @@ export const AuthProvider = ({children})=>{
         const fetchUser = async () => {
             try {
                 const userData = await getme()
-                setUser(userData)
+                if (userData.success) {
+                    setUser(userData.data.user)
+                } else {
+                    setUser(null)
+                }
             } catch (error) {
                 console.error("Failed to fetch user:", error)
+                setUser(null)
             } finally {
                 setLoading(false)
             }
