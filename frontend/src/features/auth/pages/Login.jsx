@@ -31,27 +31,51 @@ const Login = () => {
         )
     }
 
-
     return (
         <main>
-            <div className="form-container">
-                <h1>Login</h1>
-                <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            onChange={(e) => { setEmail(e.target.value) }}
-                            type="email" id="email" name='email' placeholder='Enter email address' />
+            <div className="auth-page">
+                <div className="auth-card">
+                    <div className="auth-brand">
+                        <div className="brand-logo">HireMatch AI</div>
+                        <p className="brand-tag">Smart interview prep for smarter career moves</p>
                     </div>
-                    <div className="input-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            onChange={(e) => { setPassword(e.target.value) }}
-                            type="password" id="password" name='password' placeholder='Enter password' />
+
+                    <div className="auth-header">
+                        <h1>Welcome back</h1>
+                        <p className="form-subtitle">Login to access your interview insights and personalized report.</p>
                     </div>
-                    <button className='button primary-button' >Login</button>
-                </form>
-                <p>Don't have an account? <Link to={"/register"} >Register</Link> </p>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <label htmlFor="email">Email</label>
+                            <input
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                type="email"
+                                id="email"
+                                name='email'
+                                placeholder='Enter your email address'
+                            />
+                        </div>
+
+                        <div className="input-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                type="password"
+                                id="password"
+                                name='password'
+                                placeholder='Enter your password'
+                            />
+                        </div>
+
+                        {error && <p className='form-error'>{error}</p>}
+                        <button className='button primary-button'>Login</button>
+                    </form>
+
+                    <p className="switch-text">Don't have an account? <Link to={'/register'}>Create one</Link></p>
+                </div>
             </div>
         </main>
     )

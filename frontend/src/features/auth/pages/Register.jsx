@@ -24,10 +24,7 @@ const Register = ()=>{
         } catch (error) {
             console.log(error)
             setError(error.message)
-
         }
-
-
     }
 
     if (loading) {
@@ -40,41 +37,61 @@ const Register = ()=>{
 
     return(
        <main>
-            <div className="form-container">
-
-
-                <div className='heading' >Register Page</div>
-
-                <form onSubmit={handle}>
-
-              <div className="input-group">
-                        <label htmlFor="username">Username</label>
-                        <input type="text" name="username" id="username" placeholder='Enter your username' value={username} onChange={(e) => setUsername(e.target.value)} />
-
-                    </div>
-                    <div className="input-group">
-                        <label htmlFor="email">Email</label>
-                        <input type="email" name="email" id="email" placeholder='Enter your email' value={email} onChange={(e) => setEmail(e.target.value)} />
-
+            <div className="auth-page">
+                <div className="auth-card">
+                    <div className="auth-brand">
+                        <div className="brand-logo">HireMatch AI</div>
+                        <p className="brand-tag">Build your best interview-ready profile.</p>
                     </div>
 
-                    <div className="input-group">
-                        <label htmlFor="password">Password</label>
-                        <input type="password" name="password" id="password" placeholder='Enter your password' value={password} onChange={(e) => setPassword(e.target.value)} />
-
+                    <div className="auth-header">
+                        <h1>Create an account</h1>
+                        <p className="form-subtitle">Sign up to generate tailored interview reports and resume feedback.</p>
                     </div>
-                    {error && <p className='form-error'>{error}</p>}
 
+                    <form onSubmit={handle}>
+                        <div className="input-group">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                placeholder='Enter your username'
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                        </div>
 
-                    <button className='button primary-button'>Register</button>
+                        <div className="input-group">
+                            <label htmlFor="email">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                placeholder='Enter your email'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
 
+                        <div className="input-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                placeholder='Enter your password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
 
+                        {error && <p className='form-error'>{error}</p>}
+                        <button className='button primary-button'>Register</button>
+                    </form>
 
-                </form>
-                <p>Already have an account? <Link to="/login">Login</Link></p>
-
-
-
+                    <p className="switch-text">Already have an account? <Link to="/login">Login</Link></p>
+                </div>
             </div>
         </main>
     )
