@@ -22,7 +22,7 @@ const Navbar = () => {
         <nav className='navbar'>
             <div className='navbar__container'>
                 {/* Logo */}
-                <div className='navbar__logo' onClick={() => navigate('/dashboard')}>
+                <div className='navbar__logo' onClick={() => navigate('/')}>
                     <h2>HireMatch.ai</h2>
                 </div>
 
